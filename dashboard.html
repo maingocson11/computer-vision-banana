@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - YOLO Detection System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-light: #eef2ff;
+            --secondary: #14b8a6;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --border-color: #e2e8f0;
+            --shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: var(--text-dark);
+            padding: 2rem 0;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* === NAV TOP === */
+        .top-navbar {
+            background: white;
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow);
+            animation: slideDown 0.5s ease;
+        }
+
+        .brand-top {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .brand-top h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1 0%, #14b8a6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .brand-top p {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-left: 1rem;
+            border-left: 2px solid var(--border-color);
+            padding-left: 1rem;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info .name {
+            font-weight: 600;
+            color: var(--text-dark);
+            display: block;
+            margin-bottom: 0.25rem;
+        }
+
+        .user-info .role {
+            font-size: 0.85rem;
+            color: var(--text-light);
+        }
+
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 3px solid var(--primary);
+            object-fit: cover;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .user-avatar:hover {
+            transform: scale(1.05);
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logout-btn:hover {
+            background: #dc2626;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        /* ===SLIDER === */
+        .slider-wrapper {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .slider-container {
+            position: relative;
+            width: 100%;
+            height: 350px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow);
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            height: 100%;
+            animation: zoomIn 0.5s ease;
+        }
+
+        .slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .slide.fade {
+            animation: fadeInSlide 1s ease;
+        }
+
+        @keyframes fadeInSlide {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes zoomIn {
+            from { transform: scale(0.95); }
+            to { transform: scale(1); }
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* === MAIN GRID === */
+        .dashboard-content {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card-action {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-sm);
+            border: 2px solid transparent;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .card-action:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow);
+            border-color: var(--primary);
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            transition: transform 0.3s;
+        }
+
+        .card-action:hover .card-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .card-action.detection .card-icon {
+            background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            color: white;
+        }
+
+        .card-action.forum .card-icon {
+            background: linear-gradient(135deg, #ec4899 0%, #db2777 100%);
+            color: white;
+        }
+
+        .card-action.profile .card-icon {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .card-action.history .card-icon {
+            background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+            color: white;
+        }
+
+        .card-action.export .card-icon {
+            background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+            color: white;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        /* === HISTORY SECTION === */
+        .history-section {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            animation: fadeIn 0.6s ease 0.3s both;
+            display: none;
+        }
+
+        .history-section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+        }
+
+        .section-header i {
+            color: var(--primary);
+        }
+
+        .history-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .history-card {
+            background: var(--bg-light);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+            cursor: pointer;
+            border: 2px solid transparent;
+        }
+
+        .history-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.15);
+        }
+
+        .history-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .history-card:hover .history-image {
+            transform: scale(1.05);
+        }
+
+        .history-info {
+            padding: 1rem;
+        }
+
+        .history-name {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+            color: var(--text-dark);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+        }
+
+        .history-badge {
+            background: var(--primary-light);
+            color: var(--primary);
+            padding: 0.3rem 0.7rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .history-date {
+            font-size: 0.75rem;
+            color: var(--text-light);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-light);
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            opacity: 0.3;
+            margin-bottom: 1rem;
+        }
+
+        /* === RESPONSIVE === */
+        @media (max-width: 1024px) {
+            .dashboard-content {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-navbar {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .brand-top p {
+                margin-left: 0;
+                border-left: none;
+                padding-left: 0;
+                border-top: 2px solid var(--border-color);
+                padding-top: 1rem;
+                margin-top: 1rem;
+            }
+
+            .user-section {
+                width: 100%;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .dashboard-content {
+                grid-template-columns: 1fr;
+            }
+
+            .slider-container {
+                height: 250px;
+            }
+
+            .history-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <!-- TOP NAVBAR -->
+        <nav class="top-navbar">
+            <div class="brand-top">
+                <div>
+                    <h1>🚀 YOLO AI SYSTEM</h1>
+                    <p>Nền tảng nhận diện đối tượng thế hệ mới</p>
+                </div>
+            </div>
+            
+            <div class="user-section">
+                <div class="user-info">
+                    <span class="name">{{ username }}</span>
+                    <span class="role">👤 Tài khoản người dùng</span>
+                </div>
+                {% if avatar_id %}
+                    <img src="{{ request.url_for('get_avatar_image', file_id=avatar_id) }}" alt="Avatar" class="user-avatar">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ username }}&background=667eea&color=fff&bold=true" alt="Avatar" class="user-avatar">
+                {% endif %}
+                <a href="{{ request.url_for('logout') }}" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Đăng xuất</a>
+            </div>
+        </nav>
+
+        <!-- SLIDER -->
+        <div class="slider-wrapper">
+            <div class="slider-container" id="image-slider">
+                {% if slider_images %}
+                    {% for image_path in slider_images %}
+                    <div class="slide fade">
+                        <img src="{{ request.url_for('static', path=image_path) }}" alt="Slide">
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div style="width:100%; height:100%; background: linear-gradient(135deg, #6366f1 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 1.5rem;">
+                        📸 Thư viện hình ảnh
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- MAIN ACTION CARDS -->
+        <div class="dashboard-content">
+            <a href="{{ request.url_for('streamlit_redirect') }}" class="card-action detection">
+                <div class="card-icon">🎯</div>
+                <div class="card-title">Bắt đầu Nhận Diện</div>
+                <div class="card-desc">Phân tích hình ảnh & video với AI</div>
+            </a>
+
+            <a href="{{ request.url_for('forum_page') }}" class="card-action forum">
+                <div class="card-icon">💬</div>
+                <div class="card-title">Diễn Đàn Thảo Luận</div>
+                <div class="card-desc">Trao đổi & chia sẻ kinh nghiệm</div>
+            </a>
+
+            <a href="{{ request.url_for('edit_profile_get') }}" class="card-action profile">
+                <div class="card-icon">⚙️</div>
+                <div class="card-title">Cập Nhật Hồ Sơ</div>
+                <div class="card-desc">Chỉnh sửa thông tin cá nhân</div>
+            </a>
+
+            {% if history %}
+            <button class="card-action history" id="toggle-history-btn">
+                <div class="card-icon">📋</div>
+                <div class="card-title">Xem Lịch Sử</div>
+                <div class="card-desc">{{ history|length }} hoạt động gần đây</div>
+            </button>
+
+            <a href="{{ request.url_for('export_history') }}" class="card-action export" id="export-csv-btn" style="display: none;">
+                <div class="card-icon">📊</div>
+                <div class="card-title">Xuất Báo Cáo</div>
+                <div class="card-desc">Tải dữ liệu CSV</div>
+            </a>
+            {% endif %}
+        </div>
+
+        <!-- HISTORY SECTION -->
+        {% if history %}
+        <div class="history-section" id="history-section">
+            <div class="section-header">
+                <i class="fas fa-history"></i> Lịch Sử Hoạt Động
+            </div>
+
+            <div class="history-grid">
+                {% for item in history %}
+                <div class="history-card" onclick="window.open('{{ request.url_for('get_image', file_id=item._id) }}', '_blank')">
+                    <img src="{{ request.url_for('get_image', file_id=item._id) }}" alt="Detection" class="history-image">
+                    <div class="history-info">
+                        <div class="history-name" title="{{ item.original_filename }}">{{ item.original_filename }}</div>
+                        <div class="history-meta">
+                            <span class="history-badge">{{ item.num_objects }} đối tượng</span>
+                            <span class="history-date">{{ item.uploadDate.strftime('%d/%m') }}</span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        // SLIDER
+        let slideIdx = 0;
+        function showSlides() {
+            const slides = document.getElementsByClassName('slide');
+            if (slides.length === 0) return;
+            
+            for (let i = 0; i < slides.length; i++) {
+                slides[i].style.display = 'none';
+            }
+            slideIdx++;
+            if (slideIdx > slides.length) slideIdx = 1;
+            slides[slideIdx - 1].style.display = 'block';
+            setTimeout(showSlides, 5000);
+        }
+        showSlides();
+
+        // TOGGLE HISTORY
+        const historyBtn = document.getElementById('toggle-history-btn');
+        if (historyBtn) {
+            historyBtn.addEventListener('click', function() {
+                const section = document.getElementById('history-section');
+                const exportBtn = document.getElementById('export-csv-btn');
+                
+                section.classList.toggle('active');
+                
+                if (section.classList.contains('active')) {
+                    this.querySelector('.card-title').textContent = 'Ẩn Lịch Sử';
+                    this.querySelector('.card-icon').textContent = '👁️';
+                    if (exportBtn) exportBtn.style.display = 'flex';
+                    section.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    this.querySelector('.card-title').textContent = 'Xem Lịch Sử';
+                    this.querySelector('.card-icon').textContent = '📋';
+                    if (exportBtn) exportBtn.style.display = 'none';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+</head>
+<body>
+
+    <div class="container fade-in">
+        <header class="header">
+            <div class="brand">
+                <h1>AI VISION DASHBOARD</h1>
+                <p>Hệ thống quản lý & nhận diện thông minh</p>
+            </div>
+            
+            <div class="user-profile">
+                <div class="user-info-group">
+                    <span class="user-name">Xin chào, {{ username }}</span>
+                    <span class="user-role">Member</span>
+                </div>
+                {% if avatar_id %}
+                <img src="{{ request.url_for('get_avatar_image', file_id=avatar_id) }}" alt="Avatar" class="avatar">
+                {% else %}
+                <img src="https://ui-avatars.com/api/?name={{ username }}&background=random" alt="Avatar" class="avatar">
+                {% endif %}
+                <a href="{{ request.url_for('logout') }}" class="btn-logout"><i class="fas fa-sign-out-alt"></i></a>
+            </div>
+        </header>
+
+        <div class="dashboard-grid">
+            
+            <div class="slider-wrapper">
+                <div id="image-slider" class="slider-card">
+                    {% for image_path in slider_images %}
+                    <div class="slide fade">
+                        <img src="{{ request.url_for('static', path=image_path) }}" alt="Slider Image">
+                        <div class="slide-overlay">
+                            <h3>Công nghệ AI Tiên tiến</h3>
+                            <p>Phân tích dữ liệu hình ảnh chính xác</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <nav class="actions-card">
+                <a href="{{ request.url_for('streamlit_redirect') }}" class="action-btn primary">
+                    <i class="fas fa-rocket"></i>
+                    <div>
+                        <div>Bắt đầu nhận diện</div>
+                        <div style="font-size: 0.75rem; color: var(--text-light); font-weight: 400;">Mở công cụ AI</div>
+                    </div>
+                </a>
+
+                <a href="{{ request.url_for('forum_page') }}" class="action-btn forum">
+                    <i class="fas fa-comments"></i>
+                    Diễn đàn thảo luận
+                </a>
+
+                <a href="{{ request.url_for('edit_profile_get') }}" class="action-btn warning">
+                    <i class="fas fa-user-cog"></i>
+                    Cập nhật hồ sơ
+                </a>
+
+                {% if history %}
+                <div id="toggle-history-btn" class="action-btn info" style="cursor: pointer;">
+                    <i class="fas fa-history"></i>
+                    Xem Lịch sử
+                </div>
+                
+                <a href="{{ request.url_for('export_history') }}" id="export-csv-btn" class="action-btn success" style="display: none;">
+                    <i class="fas fa-file-csv"></i>
+                    Xuất báo cáo CSV
+                </a>
+                {% endif %}
+            </nav>
+        </div>
+
+        <div id="history-section" class="history-container" style="display: none;">
+            <div class="section-title">
+                <i class="fas fa-list-alt" style="color: #4c51bf;"></i> Lịch sử hoạt động
+            </div>
+
+            {% if history %}
+                <div class="table-responsive">
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Ảnh kết quả</th>
+                                <th>Tên file</th>
+                                <th>Kết quả</th>
+                                <th>Thời gian</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in history %}
+                            <tr>
+                                <td>
+                                    <img src="{{ request.url_for('get_image', file_id=item._id) }}" class="thumbnail" onclick="window.open(this.src, '_blank')">
+                                </td>
+                                <td style="font-weight: 500;">{{ item.original_filename }}</td>
+                                <td><span class="badge">{{ item.num_objects }} Đối tượng</span></td>
+                                <td style="color: var(--text-light); font-size: 0.9rem;">
+                                    <i class="far fa-clock"></i> {{ item.uploadDate.strftime('%d-%m-%Y %H:%M') }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 3rem; color: var(--text-light);">
+                    <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                    <p>Chưa có dữ liệu lịch sử nào.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <script>
+        // Slider Logic
+        let slideIndex = 0;
+        showSlides();
+
+        function showSlides() {
+            let i;
+            const slides = document.getElementsByClassName("slide");
+            if (slides.length === 0) return;
+            
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            slideIndex++;
+            if (slideIndex > slides.length) {slideIndex = 1}
+            slides[slideIndex-1].style.display = "block";
+            // Animation fade reset
+            slides[slideIndex-1].classList.remove('fade');
+            void slides[slideIndex-1].offsetWidth; // trigger reflow
+            slides[slideIndex-1].classList.add('fade');
+            
+            setTimeout(showSlides, 4000); 
+        }
+
+        // Toggle History Logic
+        const historyBtn = document.getElementById('toggle-history-btn');
+        if (historyBtn) {
+            historyBtn.addEventListener('click', function() {
+                const historySection = document.getElementById('history-section');
+                const exportCsvBtn = document.getElementById('export-csv-btn');
+                const sliderWrapper = document.querySelector('.slider-wrapper');
+                
+                const isHidden = historySection.style.display === 'none';
+                
+                // Hiệu ứng
+                if (isHidden) {
+                    historySection.style.display = 'block';
+                    historySection.classList.add('fade-in');
+                    // Ẩn slider để tập trung vào bảng
+                    // sliderWrapper.style.display = 'none'; 
+                    this.innerHTML = '<i class="fas fa-eye-slash"></i> Ẩn Lịch sử';
+                    if(exportCsvBtn) exportCsvBtn.style.display = 'flex';
+                    
+                    // Cuộn xuống lịch sử
+                    historySection.scrollIntoView({behavior: "smooth"});
+                } else {
+                    historySection.style.display = 'none';
+                    // sliderWrapper.style.display = 'block';
+                    this.innerHTML = '<i class="fas fa-history"></i> Xem Lịch sử';
+                    if(exportCsvBtn) exportCsvBtn.style.display = 'none';
+                }
+            });
+        }
+    </script>
+    
+    {% include 'chatbot.html' %}
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ post.title }}</title>
+    <style>
+        :root {
+            --primary-color: #007bff;
+            --secondary-color: #6c757d;
+            --background-color: #f8f9fa;
+            --surface-color: #ffffff;
+            --text-color: #212529;
+            --border-color: #dee2e6;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            margin: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 2rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 1rem; border-bottom: 1px solid var(--border-color); margin-bottom: 2rem; }
+        .avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; margin-right: 10px; }
+        .user-info { font-weight: 500; }
+        .actions { display: flex; gap: 1rem; align-items: center;}
+        .btn { display: inline-block; font-weight: 400; text-align: center; vertical-align: middle; cursor: pointer; border: 1px solid transparent; padding: 0.5rem 1rem; font-size: 1rem; border-radius: 0.25rem; text-decoration: none; transition: all 0.2s ease-in-out; }
+        .btn-primary { color: #fff; background-color: var(--primary-color); border-color: var(--primary-color); }
+        .btn-secondary { color: #fff; background-color: var(--secondary-color); border-color: var(--secondary-color); }
+
+        .post-container { background-color: var(--surface-color); border: 1px solid var(--border-color); border-radius: 8px; padding: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .post-header { display: flex; align-items: center; margin-bottom: 1rem; }
+        .post-author-avatar { width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 12px; }
+        .post-meta { font-size: 0.9rem; color: var(--secondary-color); }
+        .post-title { margin: 0 0 0.5rem 0; font-size: 2rem; }
+        .post-content { margin-top: 1.5rem; line-height: 1.7; white-space: pre-wrap; }
+        .post-actions { margin-top: 2rem; display: flex; align-items: center; gap: 1rem; border-top: 1px solid var(--border-color); padding-top: 1rem; }
+        .like-btn { background: none; border: none; cursor: pointer; font-size: 1.5rem; padding: 0; }
+        .liked { color: #e74c3c; }
+        .not-liked { color: var(--secondary-color); }
+
+        .comments-section { margin-top: 2.5rem; }
+        .comment { display: flex; gap: 1rem; margin-bottom: 1.5rem; }
+        .comment-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .comment-body { flex-grow: 1; background-color: #f1f3f5; padding: 1rem; border-radius: 8px; }
+        .comment-author { font-weight: bold; }
+        .comment-timestamp { font-size: 0.8rem; color: var(--secondary-color); margin-left: 0.5rem; }
+        .comment-content { margin-top: 0.5rem; }
+
+        .comment-form textarea { width: 100%; padding: 0.75rem; border: 1px solid var(--border-color); border-radius: 4px; resize: vertical; min-height: 80px; }
+        .comment-form button { margin-top: 0.5rem; float: right; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <a href="{{ request.url_for('forum_page') }}" class="btn btn-secondary">← Quay lại diễn đàn</a>
+            <div class="actions">
+                {% if avatar_id %}
+                <img src="{{ request.url_for('get_avatar_image', file_id=avatar_id) }}" alt="Avatar" class="avatar">
+                {% endif %}
+                <span class="user-info"><strong>{{ username }}</strong></span>
+            </div>
+        </header>
+
+        <div class="post-container">
+            <div class="post-header">
+                {% if post.author_avatar_id %}
+                    <img src="{{ request.url_for('get_avatar_image', file_id=post.author_avatar_id) }}" alt="Avatar" class="post-author-avatar">
+                {% else %}
+                    <img src="https://via.placeholder.com/48" alt="Default Avatar" class="post-author-avatar">
+                {% endif %}
+                <div>
+                    <h1 class="post-title">{{ post.title }}</h1>
+                    <div class="post-meta">
+                        Đăng bởi <strong>{{ post.author_username }}</strong> vào {{ post.timestamp }}
+                    </div>
+                </div>
+            </div>
+            <div class="post-content">
+                {{ post.content }}
+            </div>
+            <div class="post-actions">
+                <form action="{{ request.url_for('like_post', post_id=post._id) }}" method="post" style="display: inline;">
+                    <button type="submit" class="like-btn {% if username in post.likes %}liked{% else %}not-liked{% endif %}">
+                        ♥
+                    </button>
+                </form>
+                <span>{{ post.likes|length }} lượt thích</span>
+            </div>
+        </div>
+
+        <div class="comments-section">
+            <h3>Bình luận ({{ comments|length }})</h3>
+            
+            <!-- Form bình luận -->
+            <div class="comment-form">
+                <form action="{{ request.url_for('post_comment', post_id=post._id) }}" method="post">
+                    <textarea name="content" placeholder="Viết bình luận của bạn..." required></textarea>
+                    <button type="submit" class="btn btn-primary">Gửi</button>
+                </form>
+            </div>
+
+            <!-- Danh sách bình luận -->
+            <div style="margin-top: 4rem;">
+                {% if comments %}
+                    {% for comment in comments %}
+                    <div class="comment">
+                        <div>
+                            {% if comment.author_details and comment.author_details.avatar_id %}
+                                <img src="{{ request.url_for('get_avatar_image', file_id=comment.author_details.avatar_id) }}" alt="Avatar" class="comment-avatar">
+                            {% else %}
+                                <img src="https://via.placeholder.com/40" alt="Default Avatar" class="comment-avatar">
+                            {% endif %}
+                        </div>
+                        <div class="comment-body">
+                            <div>
+                                <span class="comment-author">{{ comment.author_username }}</span>
+                                <span class="comment-timestamp">{{ comment.timestamp }}</span>
+                            </div>
+                            <div class="comment-content">
+                                {{ comment.content }}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <p>Chưa có bình luận nào. Hãy là người đầu tiên bình luận!</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% include 'chatbot.html' %}
+</body>
+</html>

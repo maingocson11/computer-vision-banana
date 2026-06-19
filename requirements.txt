@@ -1,0 +1,25 @@
+ultralytics==8.3.30
+opencv-python-headless==4.10.0.84
+torch==2.8.0
+torchvision==0.23.0
+numpy>=2.0.0
+pillow>=11.0.0
+onnxruntime
+
+# Thư viện cho giao diện nhận diện
+streamlit
+streamlit-webrtc
+
+# Thư viện cho cơ sở dữ liệu MongoDB và mã hóa mật khẩu
+pymongo
+bcrypt
+
+# Thư viện cho API
+fastapi
+uvicorn[standard]
+python-multipart
+jinja2
+fpdf2
+
+#thư viện cho gemini chatbox
+groq

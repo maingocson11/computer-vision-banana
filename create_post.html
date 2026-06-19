@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viết Bài Mới</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --bg-gradient: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                           radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                           radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            --glass-bg: rgba(255, 255, 255, 0.98);
+            --input-bg: #f8fafc;
+            --text-main: #1a202c;
+            --text-light: #718096;
+            --radius: 16px;
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f0f12;
+            background-image: var(--bg-gradient);
+            background-size: cover;
+            background-attachment: fixed;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            padding: 2rem;
+        }
+
+        /* Animation */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .editor-container {
+            width: 100%;
+            max-width: 850px;
+            background: var(--glass-bg);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            padding: 3rem;
+            animation: slideUp 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative Top Bar */
+        .editor-container::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+
+        /* Header Section */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .page-title h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .page-title h2 i { color: #667eea; font-size: 1.5rem; }
+
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #edf2f7;
+            padding: 6px 16px 6px 6px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            color: var(--text-light);
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        /* Form Styling */
+        .input-group {
+            margin-bottom: 2rem;
+        }
+
+        .label-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: #4a5568;
+            font-family: 'Poppins', sans-serif;
+        }
+        .label-wrapper i { color: #a0aec0; }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: var(--input-bg);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-family: inherit;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            background: #fff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+        }
+
+        textarea.form-input {
+            min-height: 300px;
+            resize: vertical;
+            line-height: 1.6;
+        }
+
+        /* Action Buttons */
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .btn-cancel {
+            text-decoration: none;
+            color: var(--text-light);
+            font-weight: 500;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-cancel:hover { color: #e53e3e; }
+
+        .btn-submit {
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            padding: 0.8rem 2rem;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(102, 126, 234, 0.25);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(102, 126, 234, 0.35);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .editor-container { padding: 1.5rem; }
+            .header { flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .user-badge { width: 100%; justify-content: flex-start; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="editor-container">
+        <header class="header">
+            <div class="page-title">
+                <h2><i class="fas fa-pen-nib"></i> Tạo Bài Đăng Mới</h2>
+            </div>
+            
+            <div class="user-badge">
+                {% if avatar_id %}
+                    <img src="{{ request.url_for('get_avatar_image', file_id=avatar_id) }}" alt="Avt" class="user-avatar">
+                {% else %}
+                    <img src="https://ui-avatars.com/api/?name={{ username }}&background=random" alt="Avt" class="user-avatar">
+                {% endif %}
+                <span>Đang viết: <strong>{{ username }}</strong></span>
+            </div>
+        </header>
+        
+        <form action="{{ request.url_for('create_post_post') }}" method="post">
+            
+            <div class="input-group">
+                <div class="label-wrapper">
+                    <i class="fas fa-heading"></i>
+                    <label for="title">Tiêu đề bài viết</label>
+                </div>
+                <input type="text" id="title" name="title" class="form-input" placeholder="Nhập một tiêu đề thật ấn tượng..." required autocomplete="off">
+            </div>
+
+            <div class="input-group">
+                <div class="label-wrapper">
+                    <i class="fas fa-paragraph"></i>
+                    <label for="content">Nội dung chi tiết</label>
+                </div>
+                <textarea id="content" name="content" class="form-input" placeholder="Chia sẻ câu chuyện hoặc ý tưởng của bạn tại đây..." required></textarea>
+            </div>
+
+            <div class="form-actions">
+                <a href="{{ request.url_for('forum_page') }}" class="btn-cancel">
+                    <i class="fas fa-times"></i> Hủy bỏ
+                </a>
+                <button type="submit" class="btn-submit">
+                    <i class="fas fa-paper-plane"></i> Đăng Bài Ngay
+                </button>
+            </div>
+
+        </form>
+    </div>
+    
+    {% include 'chatbot.html' %}
+</body>
+</html>

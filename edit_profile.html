@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cập Nhật Hồ Sơ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --glass-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2d3748;
+            --text-light: #718096;
+            --input-bg: #f7fafc;
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --radius: 20px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-size: cover;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-main);
+        }
+
+        /* Animation Fade In */
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .profile-container {
+            width: 100%;
+            max-width: 500px; /* Rộng hơn xíu cho thoáng */
+            padding: 1.5rem;
+            animation: slideUp 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+
+        .card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius);
+            padding: 3rem 2.5rem;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+            border: 1px solid rgba(255,255,255,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Decorative top bar */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            font-size: 0.9rem;
+            color: var(--text-light);
+            margin-bottom: 2rem;
+        }
+
+        /* Avatar Upload Styling */
+        .avatar-wrapper {
+            position: relative;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 2rem auto;
+        }
+
+        .avatar-img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+            transition: transform 0.3s;
+        }
+
+        .camera-btn {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 35px;
+            height: 35px;
+            background: var(--primary-gradient);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+
+        .camera-btn:hover { transform: scale(1.1); }
+        .avatar-wrapper:hover .avatar-img { transform: scale(1.02); }
+
+        /* Form Styling */
+        .input-group {
+            margin-bottom: 1.25rem;
+            text-align: left;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 0.5rem;
+            margin-left: 0.5rem;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #a0aec0;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 15px 12px 45px; /* padding-left lớn để né icon */
+            border: 2px solid transparent;
+            background: var(--input-bg);
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            font-family: inherit;
+            transition: all 0.3s;
+        }
+
+        .input-field:focus {
+            background: #fff;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            outline: none;
+        }
+
+        .input-field:focus + i { color: #667eea; }
+
+        /* Button Styling */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary-gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 1rem;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.4);
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: var(--text-light);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .back-link:hover { color: #5a67d8; }
+
+        /* Alerts */
+        .alert {
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .alert-danger { background: #fff5f5; color: #c53030; border: 1px solid #feb2b2; }
+        .alert-success { background: #f0fff4; color: #2f855a; border: 1px solid #9ae6b4; }
+
+    </style>
+</head>
+<body>
+
+    <div class="profile-container">
+        <div class="card">
+            <h2>Hồ Sơ Của Bạn</h2>
+            <p class="subtitle">Chỉnh sửa thông tin cá nhân và bảo mật</p>
+
+            {% if error %}
+                <div class="alert alert-danger"><i class="fas fa-exclamation-circle"></i> {{ error }}</div>
+            {% endif %}
+            {% if success %}
+                <div class="alert alert-success"><i class="fas fa-check-circle"></i> {{ success }}</div>
+            {% endif %}
+
+            <form method="post" enctype="multipart/form-data">
+                
+                <div class="avatar-wrapper">
+                    {% if current_avatar_id %}
+                        <img id="avatar-preview" src="{{ request.url_for('get_avatar_image', file_id=current_avatar_id) }}" class="avatar-img" alt="Current Avatar">
+                    {% else %}
+                        <img id="avatar-preview" src="https://ui-avatars.com/api/?name={{ current_username }}&background=e2e8f0&color=718096" class="avatar-img" alt="Placeholder">
+                    {% endif %}
+                    
+                    <label for="avatar-input" class="camera-btn" title="Đổi ảnh đại diện">
+                        <i class="fas fa-camera"></i>
+                    </label>
+                    <input type="file" id="avatar-input" name="avatar" accept="image/png, image/jpeg, image/gif" style="display: none;" onchange="previewImage(event)">
+                </div>
+
+                <div class="input-group">
+                    <label for="new_username">Tên hiển thị</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-user"></i>
+                        <input type="text" class="input-field" id="new_username" name="new_username" placeholder="{{ current_username }}">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="new_password">Mật khẩu mới</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock"></i>
+                        <input type="password" class="input-field" id="new_password" name="new_password" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="confirm_password">Xác nhận mật khẩu</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-check-double"></i>
+                        <input type="password" class="input-field" id="confirm_password" name="confirm_password" placeholder="••••••••">
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-submit">Lưu Thay Đổi</button>
+            </form>
+
+            <a href="{{ request.url_for('dashboard') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Quay lại Dashboard
+            </a>
+        </div>
+    </div>
+
+    <script>
+        // Script để xem trước ảnh ngay khi chọn file
+        function previewImage(event) {
+            const reader = new FileReader();
+            reader.onload = function(){
+                const output = document.getElementById('avatar-preview');
+                output.src = reader.result;
+            };
+            if(event.target.files[0]) {
+                reader.readAsDataURL(event.target.files[0]);
+            }
+        }
+    </script>
+
+    {% include 'chatbot.html' %}
+</body>
+</html>

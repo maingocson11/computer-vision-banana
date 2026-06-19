@@ -1,0 +1,12 @@
+PS D:\doan> & D:/doan/.venv/Scripts/Activate.ps1
+(.venv) PS D:\doan> python d:\doan\main.py 
+
+PS D:\doan> & D:/doan/.venv/Scripts/Activate.ps1
+(.venv) PS D:\doan> streamlit run streamlit_app.py 
+
+set api biến môi trường
+setx GROQ_API_KEY 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
+
+https://console.groq.com/keys
+
+http://127.0.0.1:8000/docs
