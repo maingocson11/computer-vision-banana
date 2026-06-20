@@ -7,7 +7,7 @@ Dự án này là một hệ thống mẫu để nhận diện (detection) sử 
 **Tính năng chính**
 
 - Nhận diện trên ảnh tĩnh (Image Detection).
-- Nhận diện thời gian thực từ camera (Camera Detection / Webcam).
+-
 - Hỗ trợ mô hình ONNX đã export (`best.onnx`) và script xuất mô hình (`export_onnx.py`).
 - Script kiểm thử mô hình ONNX (`test_onnx.py`).
 - Ứng dụng giao diện nhanh bằng `streamlit_app.py` để thử nghiệm nhanh.

@@ -1,6 +1,10 @@
 import streamlit as st
 from ultralytics import YOLO
 from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
+from detection_labels import apply_vietnamese_banana_label
+from banana_ripeness import annotate_banana_ripeness
+from PIL import Image
+import numpy as np
 
 st.set_page_config(page_title="Nhận diện qua Camera", page_icon="📸", layout="wide")
 
@@ -32,6 +36,7 @@ def apply_custom_css():
 @st.cache_resource(show_spinner="Đang tải mô hình nhận diện...")
 def load_model():
     model = YOLO("yolov8n.onnx")
+    apply_vietnamese_banana_label(model)
     return model
 
 class YOLOVideoTransformer(VideoTransformerBase):
@@ -40,9 +45,11 @@ class YOLOVideoTransformer(VideoTransformerBase):
 
     def transform(self, frame):
         img = frame.to_ndarray(format="bgr24")
-        results = self.model(img)
-        annotated_image = results[0].plot()
-        return annotated_image
+        banana_class_ids = apply_vietnamese_banana_label(self.model)
+        results = self.model(img, classes=banana_class_ids or None)
+        rgb_image = Image.fromarray(img[:, :, ::-1])
+        annotated_image, _ = annotate_banana_ripeness(rgb_image, results[0])
+        return np.asarray(annotated_image)[:, :, ::-1]
 
 # --- Main Logic ---
 apply_custom_css()

@@ -1,9 +1,10 @@
 import streamlit as st
 from ultralytics import YOLO
 from database import save_detection_result, get_user_details, db
+from detection_labels import apply_vietnamese_banana_label
+from banana_ripeness import annotate_banana_ripeness, format_ripeness_summary
 from PIL import Image
 import io
-from streamlit_webrtc import webrtc_streamer, VideoTransformerBase
 st.set_page_config(page_title="Nhận Diện AI", page_icon="🍌", layout="wide")
 def apply_custom_css():
     """Hàm để nhúng CSS tùy chỉnh vào ứng dụng Streamlit."""
@@ -224,9 +225,11 @@ def apply_custom_css():
 @st.cache_resource(show_spinner="Đang tải mô hình nhận diện...")
 def load_model():
     model = YOLO("yolov8n.onnx")  # Sử dụng mô hình ONNX
+    apply_vietnamese_banana_label(model)
     return model
 
 model = load_model()
+BANANA_CLASS_IDS = apply_vietnamese_banana_label(model)
 
 # Áp dụng CSS tùy chỉnh
 apply_custom_css()
@@ -274,6 +277,9 @@ except:
     avatar_url = ""
 
 # --- Fixed left menu (menu cứng) and main header ---
+if st.session_state.get('page') == 'camera':
+    st.session_state['page'] = None
+
 with st.container():
     left_col, main_col = st.columns([0.22, 0.78])
 
@@ -297,8 +303,6 @@ with st.container():
         # Main app pages (fixed menu buttons styled like Thống kê)
         if st.button("📷 Phân tích ảnh"):
             st.session_state['page'] = 'image'
-        if st.button("📸 Video/Webcam"):
-            st.session_state['page'] = 'camera'
 
         # Placeholder menu items (can be replaced with real targets)
         if st.button("📊 Thống kê"):
@@ -325,7 +329,7 @@ with st.container():
             )
         st.markdown('</div>', unsafe_allow_html=True)
 
-        # --- Render selected page (stats/image/camera) if chosen ---
+        # --- Render selected page (stats/image) if chosen ---
         selected = st.session_state.get('page', None)
         if selected == 'image':
             st.markdown("<h2>📷 Phân tích ảnh</h2>", unsafe_allow_html=True)
@@ -405,11 +409,10 @@ with st.container():
                 if st.button("🚀 Bắt đầu nhận diện", use_container_width=True, key="detect_image"):
                     image = Image.open(uploaded_file)
                     with st.spinner("⏳ Đang phân tích ảnh..."):
-                        results = model(image)
-                        annotated_image = results[0].plot()
-                        annotated_image_pil = Image.fromarray(annotated_image[..., ::-1])
-                        num_objects = len(results[0].boxes)
-                        save_detection_result(st.session_state.username, uploaded_file.name, num_objects, annotated_image_pil)
+                        results = model(image, classes=BANANA_CLASS_IDS or None)
+                        annotated_image_pil, ripeness_summary = annotate_banana_ripeness(image, results[0])
+                        num_bananas = len(results[0].boxes)
+                        save_detection_result(st.session_state.username, uploaded_file.name, num_bananas, annotated_image_pil)
                         
                         st.markdown("**Kết quả nhận diện**")
                         col1, col2 = st.columns(2)
@@ -420,33 +423,12 @@ with st.container():
                             st.markdown("**Ảnh đã xử lý**")
                             st.image(annotated_image_pil, use_column_width=True)
                         
-                        st.success(f"✅ Xử lý thành công!\n\n🎯 Tìm thấy **{num_objects}** đối tượng. Kết quả đã được lưu vào cơ sở dữ liệu.")
-
-        elif selected == 'camera':
-            st.markdown("<h2>📸 Video / Webcam</h2>", unsafe_allow_html=True)
-            if st.button("⬅️ Quay lại", key="back_camera"):
-                st.session_state['page'] = None
-            
-            st.info("Bật camera của bạn và hệ thống sẽ bắt đầu nhận diện trong thời gian thực. Lưu ý: chức năng này không lưu lại lịch sử.")
-            
-            try:
-                class YOLOVideoTransformer(VideoTransformerBase):
-                    def __init__(self, model):
-                        self.model = model
-                    def transform(self, frame):
-                        img = frame.to_ndarray(format="bgr24")
-                        results = self.model(img)
-                        annotated_image = results[0].plot()
-                        return annotated_image
-                
-                webrtc_streamer(
-                    key="camera-detection",
-                    video_transformer_factory=lambda: YOLOVideoTransformer(model),
-                    media_stream_constraints={"video": True, "audio": False},
-                    rtc_configuration={"iceServers": [{"urls": ["stun:stun.l.google.com:19302"]}]}
-                )
-            except Exception as e:
-                st.error(f"Lỗi khi khởi động camera: {e}. Kiểm tra xem streamlit-webrtc đã được cài đặt chưa.")
+                        st.success(
+                            f"✅ Xử lý thành công!\n\n"
+                            f"🍌 Tìm thấy **{num_bananas}** quả chuối.\n\n"
+                            f"{format_ripeness_summary(ripeness_summary)}\n\n"
+                            "Kết quả đã được lưu vào cơ sở dữ liệu."
+                        )
 
         elif selected == 'stats':
             st.markdown("<h2>📊 Thống kê nhận diện</h2>", unsafe_allow_html=True)

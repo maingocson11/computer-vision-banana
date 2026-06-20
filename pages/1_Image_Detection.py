@@ -3,6 +3,8 @@ from ultralytics import YOLO
 from PIL import Image
 import io
 from database import save_detection_result
+from detection_labels import apply_vietnamese_banana_label
+from banana_ripeness import annotate_banana_ripeness, format_ripeness_summary
 import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Nhận diện qua ảnh", page_icon="📁", layout="wide")
@@ -98,19 +100,23 @@ def apply_custom_css():
 @st.cache_resource(show_spinner="Đang tải mô hình nhận diện...")
 def load_model():
     model = YOLO("yolov8n.onnx")
+    apply_vietnamese_banana_label(model)
     return model
 
 def process_and_save_image(image_bytes, source_filename, username, model):
     image = Image.open(image_bytes)
     st.image(image, caption=f"Ảnh gốc: {source_filename}", use_column_width=True)
     with st.spinner("Đang xử lý..."):
-        results = model(image)
-        annotated_image = results[0].plot()
-        annotated_image_pil = Image.fromarray(annotated_image[..., ::-1])
-        num_objects = len(results[0].boxes)
-        save_detection_result(username, source_filename, num_objects, annotated_image_pil)
+        banana_class_ids = apply_vietnamese_banana_label(model)
+        results = model(image, classes=banana_class_ids or None)
+        annotated_image_pil, ripeness_summary = annotate_banana_ripeness(image, results[0])
+        num_bananas = len(results[0].boxes)
+        save_detection_result(username, source_filename, num_bananas, annotated_image_pil)
         st.image(annotated_image_pil, caption="Ảnh đã nhận diện", use_column_width=True)
-        st.success(f"Xử lý thành công! Tìm thấy **{num_objects}** đối tượng. Kết quả đã được lưu.")
+        st.success(
+            f"Xử lý thành công! Tìm thấy **{num_bananas}** quả chuối. "
+            f"{format_ripeness_summary(ripeness_summary)}. Kết quả đã được lưu."
+        )
 
 # --- Main Logic ---
 apply_custom_css()
