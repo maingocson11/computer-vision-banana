@@ -2,8 +2,7 @@
 
 **Giới thiệu**
 
-Dự án này là một hệ thống mẫu để nhận diện (detection) sử dụng mô hình ONNX, bao gồm phát hiện ảnh tĩnh và phát hiện từ camera. Mục tiêu là cung cấp một bộ công cụ nhỏ gọn để thử nghiệm mô hình ONNX, chạy thử nghiệm trên ảnh, chạy nhận diện thời gian thực từ webcam, và tích hợp giao diện hiển thị (Streamlit / trang web đơn giản). README này mô tả các chức năng chính, cấu trúc file, hướng dẫn cài đặt và cách sử dụng.
-
+Dự án xây dựng hệ thống nhận diện và phân loại trạng thái chuối bằng mô hình trí tuệ nhân tạo sử dụng định dạng ONNX. Hệ thống hỗ trợ nhận diện trên ảnh tĩnh, nhận diện thời gian thực từ webcam và cung cấp giao diện trực quan để người dùng dễ dàng thao tác. Mục tiêu của dự án là tạo ra một nền tảng thử nghiệm nhỏ gọn, phục vụ nghiên cứu và phát triển các ứng dụng thị giác máy tính trong lĩnh vực nông nghiệp.
 **Tính năng chính**
 
 - Nhận diện trên ảnh tĩnh (Image Detection).
